@@ -90,6 +90,7 @@ pres = nc.variables['ps'][:]
 us = nc.variables['ua'][:]*1.94384449 #to kt
 vs = nc.variables['va'][:]*1.94384449
 temps = nc.variables['ta'][:]
+precip_convs = nc.variables['prc'][:]*1000*60*60 #to mm/hr
 
 times = nc.variables['time'][:]
 
@@ -98,13 +99,16 @@ winds = np.sqrt(us**2 + vs**2) #calc winds in kts
 
 nc.close()
 
-START_TIME = 30*4+0 #37 00
-END_TIME = 40*4+0 #37 12
+START_TIME = 0*4+0 #37 00
+END_TIME = 59*4+3 #37 12
 SURFACE_WIND_LEVEL = 5 #1000 hPa
 UPPER_WIND_LEVEL = 1 #250 hPa
 OUTFILE = "lowpts"
 storms = {}
 storm_id = 0
+
+f = open(OUTFILE, 'w') #blank the file
+f.close()
 
 for TIME in xrange(START_TIME, END_TIME+1):
 	# find low centers
@@ -165,7 +169,17 @@ for TIME in xrange(START_TIME, END_TIME+1):
 			tropicalflag = False
 
 		#criterion 4 - convective precip > 0.36 mm/hr (average)
+		convective_precip_grid = precip_convs[TIME,miny:maxy,minx:maxx]
+		
+		convective_precip = np.mean(convective_precip_grid)
+		if convective_precip > 0.36:
+			convective_precip_color = "\033[92m"
+		else:
+			convective_precip_color = "\033[91m"
+			tropicalflag = False
+
 		#criterion 6 - 300 hPa wind < 8 m/s at track start (average)
+
 		#criterion 8 - 300 hPa temp max in grid greater than average by 1 K
 		upper_temp_grid = temps[TIME,UPPER_WIND_LEVEL,miny:maxy,minx:maxx]
 		
@@ -178,9 +192,15 @@ for TIME in xrange(START_TIME, END_TIME+1):
 			upper_temp_anom_color = "\033[91m"
 			tropicalflag = False
 
-		print "%.1f %.1f (%s, %s)\t\t%s%d kts\033[0m %d hPa\t%s%d kts\033[0m\t%s%.1f K\033[0m" % (low_lat, low_lon, y, x, wind_color, wind, min_pr, upper_wind_color, upper_wind, upper_temp_anom_color, upper_temp_anom)
+		#make tropical status blurb
+		if tropicalflag == True:
+			tropical_status = "\033[93mtropical\033[0m"
+		else:
+			tropical_status = ""
 
-		#time,lat,lon,wind,pres ...
+		print "%.1f %.1f (%s, %s)\t\t%s%d kts\033[0m %d hPa\t%s%d kts\033[0m\t%s%.1f K\033[0m\t%s%.2f mm/hr\033[0m%s" % (low_lat, low_lon, y, x, wind_color, wind, min_pr, upper_wind_color, upper_wind, upper_temp_anom_color, upper_temp_anom, convective_precip_color, convective_precip, tropical_status)
+
+		#time,lat,lon,wind,pres,tropicalflag ...
 		#check if storm exists already in dictionary
 		newstormflag = True
 		stormdatatuple = (fnfmt(times[TIME]), low_lat, low_lon, wind, min_pr, tropicalflag)
