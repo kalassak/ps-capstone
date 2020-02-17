@@ -119,18 +119,14 @@ for TIME in xrange(START_TIME, END_TIME+1):
 	low_lons = lons[mxx]
 	low_lats = lats[mxy]
 
-	# find wind maxima
-	data_ext = maximum_filter(winds[TIME,SURFACE_WIND_LEVEL], 50, mode='nearest')
-	mwy, mwx = np.where(data_ext == winds[TIME,SURFACE_WIND_LEVEL])
-
-	# get lat/lon of all wind maxima
-	wind_lons = lons[mwx]
-	wind_lats = lats[mwy]
-
 	#get info on each low
 	CROP = 8
 	print pres.shape
 	min_prs = pres[TIME,mxy,mxx]
+
+	#prepare tc lists
+	tc_lons = []
+	tc_lats = []
 
 	#print info
 	for low_lon, low_lat, y, x, min_pr in zip(low_lons, low_lats, mxy, mxx, min_prs):
@@ -156,7 +152,7 @@ for TIME in xrange(START_TIME, END_TIME+1):
 			wind_color = "\033[92m"
 		else:
 			wind_color = "\033[91m"
-			tropicalflag = False
+			#tropicalflag = False
 
 		#criterion 3 - 300 hPa wind < 20 m/s (average)
 		upper_wind_grid = winds[TIME,UPPER_WIND_LEVEL,miny:maxy,minx:maxx]
@@ -192,13 +188,15 @@ for TIME in xrange(START_TIME, END_TIME+1):
 			upper_temp_anom_color = "\033[91m"
 			tropicalflag = False
 
-		#make tropical status blurb
+		#make tropical status blurb and add point to tc location lists
 		if tropicalflag == True:
-			tropical_status = "\033[93mtropical\033[0m"
+			tropical_status = "\033[93mtrop\033[0m"
+			tc_lons.append(low_lon)
+			tc_lats.append(low_lat)
 		else:
 			tropical_status = ""
 
-		print "%.1f %.1f (%s, %s)\t\t%s%d kts\033[0m %d hPa\t%s%d kts\033[0m\t%s%.1f K\033[0m\t%s%.2f mm/hr\033[0m%s" % (low_lat, low_lon, y, x, wind_color, wind, min_pr, upper_wind_color, upper_wind, upper_temp_anom_color, upper_temp_anom, convective_precip_color, convective_precip, tropical_status)
+		print "%.1f %.1f (%s, %s)\t\t%s%d kts\033[0m %d hPa\t%s%d kts\033[0m\t%s%.1f K\033[0m\t%s%.2f mm/hr\033[0m %s" % (low_lat, low_lon, y, x, wind_color, wind, min_pr, upper_wind_color, upper_wind, upper_temp_anom_color, upper_temp_anom, convective_precip_color, convective_precip, tropical_status)
 
 		#time,lat,lon,wind,pres,tropicalflag ...
 		#check if storm exists already in dictionary
@@ -250,7 +248,7 @@ for TIME in xrange(START_TIME, END_TIME+1):
 		# plot pres contours & low centers
 		plt.contour(lons, lats, pres[TIME], levels=preslevels, linewidths=1, colors='k', zorder=0)
 		plt.plot(low_lons, low_lats, 'ro')
-		plt.plot(wind_lons, wind_lats, 'yo')
+		plt.plot(tc_lons, tc_lats, 'go')
 
 		#plt.colorbar(fraction=0.025, pad=0.01)
 
