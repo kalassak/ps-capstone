@@ -27,6 +27,7 @@ def service_fmt_lsm(n):
 	return t
 
 OPT = 'lsm' #'elev' or 'lsm'
+RES = 256 #32 or 256
 
 #PlaSim uses GTOPO30 but this dataset is from http://research.jisao.washington.edu/data_sets/elevation/
 if OPT == 'elev':
@@ -44,7 +45,7 @@ if OPT == 'elev':
 
 nc.close()
 
-nc2 = netCDF4.Dataset("../nc/ncout_small.nc")
+nc2 = netCDF4.Dataset("../nc/ncout.nc")
 
 lats_n256 = nc2.variables['lat'][:]
 lons_n256 = nc2.variables['lon'][:]
@@ -98,8 +99,12 @@ elif OPT == 'lsm':
 print("writing service file...")
 
 if OPT == 'elev':
-	f = open("n032_elev.sra", "w")
-	f.write("       129         0  20070101         0        64        32         0         0\n")
+	if RES == 32:
+		f = open("n032_elev.sra", "w")
+		f.write("       129         0  20070101         0        64        32         0         0\n")
+	elif RES == 256:
+		f = open("n256_elev.sra", "w")
+		f.write("       129         0  20090101        -1       512       256         0         0\n")
 
 	l = ''
 	for i, gpm in enumerate(gpms):
@@ -109,8 +114,12 @@ if OPT == 'elev':
 			f.write(l)
 			l = ''
 elif OPT == 'lsm':
-	f = open("n032_lsm.sra", "w")
-	f.write("       172         0  20090101         0        64        32         0         0\n")
+	if RES == 32:
+		f = open("n032_lsm.sra", "w")
+		f.write("       172         0  20090101         0        64        32         0         0\n")
+	elif RES == 256:
+		f = open("n256_lsm.sra", "w")
+		f.write("       172         0  20090101        -1       512       256         0         0\n")
 
 	l = ''
 	for i, lsm in enumerate(lsms):
