@@ -6,7 +6,7 @@ scripts for PlaSim capstone project
 
 `ps_pres.py` - generates MSLP, 1000-500 hPa thickness, 1000 hPa wind plots for each 6-hour output  
 `ps_temp.py` - generates temperature (currently `tas`) plots for each 6-hour output  
-`reland.py` - generates orography and land-sea mask PlaSim .sra format files from 0.25 degree topography data using area-conservative regridding  
+`reland.py` - generates PlaSim .sra format orography and land-sea mask files from 0.25 degree topography data using area-conservative regridding  
 `tcfind.py` - writes a cyclone track file `lowpts` with location, wind, pressure, and nature (tropical, non-tropical) information, also generates diagnostic plots  
 `tcplot.py` - reads in cyclone track data from `lowpts` and plots them for visual assessment  
 `tcheatmap.py` - reads in cyclone track data from `lowpts` and bins the data on a lat/lon grid to create a "heatmap" of the spatial frequency of tropical cyclones and cyclogenesis  
