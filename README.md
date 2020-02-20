@@ -19,11 +19,11 @@ scripts for PlaSim capstone project
 
 ## examples
 
-###tcplot.py
+### tcplot.py
 
 <img src='./images/tracks_zoom.png' width="720px" />
 
-###tcheatmap.py
+### tcheatmap.py
 
 activity map - 2x2 degree bin
 
